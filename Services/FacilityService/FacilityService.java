@@ -5,7 +5,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FacilityService {
+public class FacilityService extends RepositoryBase<FacilityEntity> {
+    @Override
+    protected String tableName = "Facilities";
+
+    @Override
+    protected FacilityEntity createEntityFromResultSet(ResultSet rs) throws SQLException {
+        return new FacilityEntity(rs);
+    }
 
     public List<Facility> getAllFacilities() {
         List<Facility> facilities = new ArrayList<>();
@@ -30,7 +37,7 @@ public class FacilityService {
     }
 
     public Facility getFacilityById(String id) {
-        Facility facility = null;
+        FacilityEntity entity = null;
 
         String sql = "SELECT TOP 1 * FROM Facilities WHERE Id = ?;";
 
@@ -39,7 +46,7 @@ public class FacilityService {
              ps.setString(1, id);
              ResultSet rs = ps.executeQuery()) {
 
-            FacilityEntity entity = new FacilityEntity(rs);  
+            entity = new FacilityEntity(rs);  
         } catch (Exception e) {
             // Handle the exception appropriately, log or rethrow if necessary
             System.err.println("Error retrieving facilities: " + e.getMessage());
@@ -63,10 +70,13 @@ public class FacilityService {
             if (getDetails) {
                 switch (facility.getFacilityType()) {
                     case FacilityType.Villa:
+                        facility.setVilla();
                         break;
                     case FacilityType.House:
+                        facility.setHouse();
                         break;
                     case FacilityType.Room:
+                        facility.setRoom();
                         break;
                 }
             }
